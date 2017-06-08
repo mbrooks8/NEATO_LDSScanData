@@ -1,19 +1,19 @@
 # NEATO_LDSScanData
-Node.js controller for gathering LDS scan data
+Node.js controller for gathering and visualizing LDS scan data
 
 # What you will need 
-Nodejs installed on your desktop 
-XAMPP to run a localhost
-sqlite3.x installed on ios device 
-CLSMS installed on ios device from https:// s1ris.github.io/repo 
-
+Nodejs installed on your desktop <br>
+XAMPP to run a localhost <br>
+Any recent type of Neato Botvac <br>
+Scatter.js and chart.js
 
 # Current features 
-view messages 
-send messages 
-Free? 
+Send commands to the Botvac
+Recieve data from the Botvac
+Graph LDS Scan Data
 
 # Setup 
+On windows:<br>
 just fill out the config file with the appropriate ip addresses and password. 
 
 # extra setup 
