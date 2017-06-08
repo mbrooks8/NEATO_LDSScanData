@@ -24,7 +24,7 @@ var port = new SerialPort("COM6", {
     parser: SerialPort.parsers.readline("\n")
 });
 port.on('open', function() {
-    port.write('start_app', function(err) {
+    port.write('testmode on', function(err) {
         if (err) {
             return console.log('Error on write: ', err.message);
         }
@@ -67,8 +67,63 @@ module.exports = {
             }
         }
         return thingToSend;
-    }
+    },
 
+    MakeLDSScanData: function(data){
+        for (counter = 0; counter < 363; counter++){
+            temp = data.split(',');
+            if(temp[3] == 0 ){
+                LDSScanData.push({
+                    AngleInDegrees:temp[0],
+                    DistInMM:temp[1],
+                    Intensity:temp[2],
+                    ErrorCodeHEX:temp[3]
+                });
+            }
+            return LDSScanData;
+        }
+    },
+
+    thingToSend: function(LDSScanData){
+        var thingToSend = [];
+
+        var l = LDSScanData.length;
+        for (i = 1; i < l - 2; i++) {
+            if (LDSScanData[i].DistInMM > 125 && LDSScanData[i].DistInMM < 1000){
+
+                thingToSend += "<p style='color:red;'>" + LDSScanData[i].DistInMM + "mm @" + LDSScanData[i].AngleInDegrees + " Degrees</p>";
+            }
+            else{
+                thingToSend += "<p>" + LDSScanData[i].DistInMM + "mm @" + LDSScanData[i].AngleInDegrees + " Degrees</p>";
+            }
+        }
+    },
+
+    graph: function(LDSScanData){
+        var pos = [];
+        var posX;
+        var posY;
+        //Calculate this outside so we dont need to do the math each time
+        var PI_180 = (Math.PI/180);
+        for (i = 0; i < l; i ++) {
+
+            if(LDSScanData[i].DistInMM <= 1000 )
+            {
+                posX = LDSScanData[i].DistInMM * Math.sin(LDSScanData[i].AngleInDegrees * PI_180);
+                posY = LDSScanData[i].DistInMM * Math.cos(LDSScanData[i].AngleInDegrees * PI_180);
+                pos.push({
+                    y: posY,
+                    x: -posX
+                });
+            }
+        }
+
+        persistantSocket.send(thingToSend);
+        persistantSocket.emit('graph', pos);
+        LDSScanData = [];
+        counter = 0;
+        pos = [];
+    }
 } 
 
 io.on('connection', function(socket){
@@ -147,9 +202,8 @@ port.on('data', function (data) {
     if(counter == 363){
 
         var thingToSend = [];
-        var pos = [];
+
         var l = LDSScanData.length;
-        console.log(l);
         for (i = 1; i < l - 2; i++) { 
             if (LDSScanData[i].DistInMM > 125 && LDSScanData[i].DistInMM < 1000){
 
@@ -160,21 +214,27 @@ port.on('data', function (data) {
             }
         }
 
+
+        var pos = [];
         var posX;
         var posY;
-        for (i = 0; i < l; i++) { 
-            posX = LDSScanData[i].DistInMM * Math.sin(LDSScanData[i].AngleInDegrees * (Math.PI/180));
-            posY = LDSScanData[i].DistInMM * Math.cos(LDSScanData[i].AngleInDegrees * (Math.PI/180));
+        //Calculate this outside so we dont need to do the math each time
+        var PI_180 = (Math.PI/180);
+        for (i = 0; i < l; i ++) {
 
-            if (LDSScanData[i].DistInMM <= 750 ){
+            if(LDSScanData[i].DistInMM <= 1000 )
+            {
+                posX = LDSScanData[i].DistInMM * Math.sin(LDSScanData[i].AngleInDegrees * PI_180);
+                posY = LDSScanData[i].DistInMM * Math.cos(LDSScanData[i].AngleInDegrees * PI_180);
                 pos.push({
                     y: posY,
                     x: -posX
                 });
             }
         }
+
         persistantSocket.send(thingToSend);
-        persistantSocket.emit('LDSScanData', pos);
+        persistantSocket.emit('graph', pos);
         LDSScanData = [];
         counter = 0;
         pos = [];

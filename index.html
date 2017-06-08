@@ -52,19 +52,37 @@
 
             document.getElementById("response").innerHTML = data + "<br>";
         });
+
         var pos2 = [];
         pos2.push({
             x:0,
             y:0
         });
-        socket.on('LDSScanData', function(pos){
+        pos2.push({
+            x:0,
+            y:-105
+        });
+        pos2.push({
+            x:0,
+            y:245
+        });
+        pos2.push({
+            x:-168,
+            y:245
+        });
+        pos2.push({
+            x:168,
+            y:245
+        });
+
+        socket.on('graph', function(pos){
 
             var ctx = document.getElementById("header-canvas").getContext("2d");
             var myChart = new Chart(ctx).Scatter([
-                { label: "dataset 1", data: pos }, 
-                { label: "dataset 2", data: pos2 } ], {
+                { label: "Stuff", data: pos },
+                { label: "Robit", data: pos2 } ], {
                 showScale: true,
-                scaleShowLabels: false,
+                scaleShowLabels: true,
                 scaleShowHorizontalLines: true,
                 scaleShowVerticalLines: true,
                 scaleLineWidth: 1,
@@ -78,11 +96,17 @@
                 animation: false,
                 // Boolean - Whether to show a stroke for datasets
                 datasetStroke: false,
-                showTooltips: false,
-                
+                showTooltips: true,
+
             });
         });
-
+        for (i = 0; i < myChart.data.datasets[0].data.length; i++) {
+            if (myChart.data.datasets[0].data[i] > 100) {
+                pointBackgroundColors.push("#90cd8a");
+            } else {
+                pointBackgroundColors.push("#f58368");
+            }
+        }
         //calculate things that are too close
         function sendMessage()
         {
