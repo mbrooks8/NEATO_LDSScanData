@@ -1,0 +1,23 @@
+{
+    "name": "michael",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "dependencies": {
+        "babyparse": "^0.4.6",
+        "chai": "^4.0.2",
+        "express": "^4.15.3",
+        "http": "^0.0.0",
+        "papaparse": "^4.3.2",
+        "request": "^2.81.0",
+        "serialport": "^4.0.7",
+        "socket.io": "^2.0.2"
+    },
+    "devDependencies": {},
+    "scripts": {
+        "test": "mocha",
+        "start": "node index.js"
+    },
+    "author": "",
+    "license": "ISC"
+}
