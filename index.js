@@ -5,18 +5,26 @@ var server = http.createServer(app);
 var fs = require('fs');
 var Promise = require("bluebird");
 
+
 //LDS Stuff
 var counter = 0;
 var LDSScanData = [];
 
 //this is for setldsrotation to toggle on and off with the button
 var toggled = 0;
+var DistInMM;
 
 //this is for the angles and distances that is printed
 var thingToSend = [];
 
 //this is for  = LDSScanData.length;
 var l;
+
+//This is for my graph
+var pos = [];
+var posX;
+var posY;
+var PI_180 = (Math.PI/180);
 
 //SENDING STUFF TO WEBSITE
 var io = require('socket.io').listen(server);	//This makes sending and recieving data from the server easy
@@ -35,73 +43,6 @@ var port = new SerialPort("COM6", {
 });
 
 module.exports = {
-    tooClose: function(data){
-        var contents = fs.readFileSync(data);
-        var json = JSON.parse(contents);
-        var thingToSend = [];
-        for (i = 1; i < json.length - 1; i++) { 
-            if (json[i].DistInMM > 500 && json[i].DistInMM < 1000){
-                thingToSend += json[i].DistInMM + "mm @" + json[i].AngleInDegrees + " Degrees<br>"; 
-            }
-        }
-        return thingToSend;
-    },
-
-    MakeLDSScanData: function(data){
-        for (counter = 0; counter < 363; counter++){
-            temp = data.split(',');
-            if(temp[3] == 0 ){
-                LDSScanData.push({
-                    AngleInDegrees:temp[0],
-                    DistInMM:temp[1],
-                    Intensity:temp[2],
-                    ErrorCodeHEX:temp[3]
-                });
-            }
-            return LDSScanData;
-        }
-    },
-
-    thingToSend: function(LDSScanData){
-        var thingToSend = [];
-
-        var l = LDSScanData.length;
-        for (i = 1; i < l - 2; i++) {
-            if (LDSScanData[i].DistInMM > 125 && LDSScanData[i].DistInMM < 1000){
-
-                thingToSend += "<p style='color:red;'>" + LDSScanData[i].DistInMM + "mm @" + LDSScanData[i].AngleInDegrees + " Degrees</p>";
-            }
-            else{
-                thingToSend += "<p>" + LDSScanData[i].DistInMM + "mm @" + LDSScanData[i].AngleInDegrees + " Degrees</p>";
-            }
-        }
-    },
-
-    graph: function(LDSScanData){
-        var pos = [];
-        var posX;
-        var posY;
-        //Calculate this outside so we dont need to do the math each time
-        var PI_180 = (Math.PI/180);
-        for (i = 0; i < l; i ++) {
-
-            if(LDSScanData[i].DistInMM <= 1000 )
-            {
-                posX = LDSScanData[i].DistInMM * Math.sin(LDSScanData[i].AngleInDegrees * PI_180);
-                posY = LDSScanData[i].DistInMM * Math.cos(LDSScanData[i].AngleInDegrees * PI_180);
-                pos.push({
-                    y: posY,
-                    x: -posX
-                });
-            }
-        }
-
-        persistantSocket.send(thingToSend);
-        persistantSocket.emit('graph', pos);
-        LDSScanData = [];
-        counter = 0;
-        pos = [];
-    },
 
     getLDSScan: function(){
         //get new LDS scan data
@@ -148,33 +89,30 @@ module.exports = {
     },
 
     getDistanceAndAngles: function(){
+        console.log(LDSScanData);
+        while (l--) {
+            if (LDSScanData[l].DistInMM < 800){
 
-        for (i = 1; i < l - 2; i++) {
-            if (LDSScanData[i].DistInMM > 125 && LDSScanData[i].DistInMM < 1000){
-
-                thingToSend += "<p style='color:red;'>" + LDSScanData[i].DistInMM + "mm @" + LDSScanData[i].AngleInDegrees + " Degrees</p>";
+                thingToSend += "<p style='color:red;'>" + LDSScanData[l].DistInMM + "mm @" + LDSScanData[l].AngleInDegrees + " Degrees</p>";
             }
             else{
-                thingToSend += "<p>" + LDSScanData[i].DistInMM + "mm @" + LDSScanData[i].AngleInDegrees + " Degrees</p>";
+                thingToSend += "<p>" + LDSScanData[l].DistInMM + "mm @" + LDSScanData[l].AngleInDegrees + " Degrees</p>";
             }
         }
         persistantSocket.send(thingToSend);
+        thingToSend = [];
 
     },
 
     getGraph: function(){
 
-        var pos = [];
-        var posX;
-        var posY;
-        //Calculate this outside so we dont need to do the math each time
-        var PI_180 = (Math.PI/180);
-        for (i = 0; i < l; i ++) {
 
-            if(LDSScanData[i].DistInMM <= 1000 )
+        while(l--){
+
+            if(LDSScanData[l].DistInMM < 800)
             {
-                posX = LDSScanData[i].DistInMM * Math.sin(LDSScanData[i].AngleInDegrees * PI_180);
-                posY = LDSScanData[i].DistInMM * Math.cos(LDSScanData[i].AngleInDegrees * PI_180);
+                posX = LDSScanData[l].DistInMM * Math.sin(LDSScanData[l].AngleInDegrees * PI_180);
+                posY = LDSScanData[l].DistInMM * Math.cos(LDSScanData[l].AngleInDegrees * PI_180);
                 pos.push({
                     y: posY,
                     x: -posX
@@ -210,6 +148,34 @@ module.exports = {
 
     },
 }
+
+
+
+var temp = new Array();
+port.on('data', function (data) {
+    counter++;
+    temp = data.split(',');
+    if(temp[3] == 0 ){
+        LDSScanData.push({
+            AngleInDegrees:temp[0],
+            DistInMM:temp[1],
+        });
+    }
+
+    if(counter == 363){
+
+        l = LDSScanData.length;
+
+        module.exports.getDistanceAndAngles();
+
+        module.exports.getGraph();
+
+        LDSScanData = [];
+        counter = 0;
+
+    }
+});
+
 //when you first open the connection to the port
 port.on('open', function() {
     //turn off lds if it was on and set it to test mode
@@ -241,35 +207,6 @@ io.on('connection', function(socket){
 
     console.log("Website connected");
 });
-
-
-var temp = new Array();
-port.on('data', function (data) {
-    counter++;
-    temp = data.split(',');
-    if(temp[3] == 0 ){
-        LDSScanData.push({
-            AngleInDegrees:temp[0],
-            DistInMM:temp[1],
-            Intensity:temp[2],
-            ErrorCodeHEX:temp[3]
-        });
-    }
-
-    if(counter == 363){
-
-        l = LDSScanData.length;
-
-        module.exports.getDistanceAndAngles();
-
-        module.exports.getGraph();
-
-        LDSScanData = [];
-        counter = 0;
-
-    }
-});
-
 
 //GO TO localhost:3000 to view the website
 server.listen(3000, function(){
