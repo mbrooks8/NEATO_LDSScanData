@@ -12,3 +12,10 @@ describe('tooClose', function(){
         assert.typeOf(result, 'string');
     });
 })
+
+describe('MakeLSDScanData', function(){
+    it('should return my LDSScanData as an object without any error codes', function(){
+        let result = index.MakeLDSScanData('./data.json');
+        assert.typeOf(result,'object');
+    })
+})
