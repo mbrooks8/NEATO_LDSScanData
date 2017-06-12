@@ -88,8 +88,8 @@ module.exports = {
 
     },
 
-    getDistanceAndAngles: function(){
-        console.log(LDSScanData);
+    getDistanceAndAngles: function(LDSScanData){
+         l = LDSScanData.length;
         while (l--) {
             if (LDSScanData[l].DistInMM < 800){
 
@@ -104,9 +104,8 @@ module.exports = {
 
     },
 
-    getGraph: function(){
-
-
+    getGraph: function(LDSScanData){
+         l = LDSScanData.length;
         while(l--){
 
             if(LDSScanData[l].DistInMM < 800)
@@ -157,18 +156,16 @@ port.on('data', function (data) {
     temp = data.split(',');
     if(temp[3] == 0 ){
         LDSScanData.push({
-            AngleInDegrees:temp[0],
-            DistInMM:temp[1],
+            "AngleInDegrees" : temp[0],
+            "DistInMM" : temp[1]
         });
     }
 
     if(counter == 363){
 
-        l = LDSScanData.length;
+        module.exports.getDistanceAndAngles(LDSScanData);
 
-        module.exports.getDistanceAndAngles();
-
-        module.exports.getGraph();
+       module.exports.getGraph(LDSScanData);
 
         LDSScanData = [];
         counter = 0;

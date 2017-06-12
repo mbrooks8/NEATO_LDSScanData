@@ -22,15 +22,16 @@
 
             <h3>Server Messages</h3>
             <div class="row">
-                <div class="col-sm-4">
-                    <div id="response"></div>
-                </div>
                 <div class="col-sm-8">
 
                     <canvas id="header-canvas" width="600" height="480"></canvas>
 
                     <div id="LDSScanDataa"></div>
                 </div>
+                <div class="col-sm-4">
+                    <div id="response"></div>
+                </div>
+
             </div>
 
 
@@ -110,14 +111,14 @@
             socket.emit('LDSScan', "test");
         }
 
-                //spam
+        //spam
         function spam()
         {
 
             setInterval(function() {
                 console.log("im doing something");
                 socket.emit('LDSScan', "test");
-            }, 5000);
+            }, 3000);
 
         }
     </script>
