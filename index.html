@@ -72,7 +72,31 @@
             x:168,
             y:245
         });
-        socket.on('graph', function(pos){
+        var pos = [];
+        var thing = [];
+        var ctx = document.getElementById("header-canvas").getContext("2d");
+        var myChart = new Chart(ctx).Scatter([
+            { label: "Stuff", data: pos },
+            { label: "Robit", data: pos2 } ], {
+            showScale: true,
+            scaleShowLabels: true,
+            scaleShowHorizontalLines: true,
+            scaleShowVerticalLines: true,
+            scaleLineWidth: 1,
+            scaleLineColor: "red",
+            scaleGridLineColor: "rgba(0,0,0,.5)",
+            datasetPointStrokeColor: 'red',
+            scaleGridLineWidth: 1,
+            pointDotStrokeWidth: 0,
+            pointDot: true,
+            scaleType: 'number',
+            animation: false,
+            // Boolean - Whether to show a stroke for datasets
+            datasetStroke: false,
+            showTooltips: false,
+        });
+
+        socket.on('graph', async function(pos){
             var ctx = document.getElementById("header-canvas").getContext("2d");
             var myChart = new Chart(ctx).Scatter([
                 { label: "Stuff", data: pos },
@@ -94,31 +118,28 @@
                 datasetStroke: false,
                 showTooltips: false,
             });
+
         });
         //calculate things that are too close
-        function sendMessage()
-        {
+        function sendMessage(){
             socket.emit('runMyFunction', "test");
         }
         //toggle lds rotation
-        function setldsrotation()
-        {
+        function setldsrotation(){
             socket.emit('setldsrotation', "test");
         }
         //get data from lds scan
-        function LDSScan()
-        {
+        function LDSScan(){
             socket.emit('LDSScan', "test");
         }
 
         //spam
-        function spam()
-        {
+        function spam(){
 
             setInterval(function() {
                 console.log("im doing something");
                 socket.emit('LDSScan', "test");
-            }, 3000);
+            }, 1000);
 
         }
     </script>
