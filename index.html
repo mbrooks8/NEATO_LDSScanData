@@ -14,11 +14,22 @@
     <body>
         <div class="container">
             <h1>LDS Scan Reader</h1>
+            <div class="row">
+                <button class="btn btn-danger"  onclick="runMyFunction()">Do Something</button>
+                <button class="btn btn-primary"  onclick="setldsrotation()">SET LDS Rotation</button>
+                <button class="btn btn-info"  onclick="LDSScan()">Get LDS Scan Data</button>
+                <button class="btn btn-warning"  onclick="spam()">Spam That Data</button>
+            </div>
+            <label for="usr">This will work eventually:</label>
+            <input type="text" class="form-control" id="input1">
 
-            <button class="btn btn-danger"  onclick="runMyFunction()">Do Something</button>
-            <button class="btn btn-primary"  onclick="setldsrotation()">SET LDS Rotation</button>
-            <button class="btn btn-info"  onclick="LDSScan()">Get LDS Scan Data</button>
-            <button class="btn btn-warning"  onclick="spam()">Spam That Shit</button>
+            <script>
+                $("#input1").on('keyup', function (e) {
+                    if (e.keyCode == 13) {
+                        cool();
+                    }
+                });
+            </script>
 
             <h3>Server Messages</h3>
             <div class="row">
@@ -58,19 +69,31 @@
         });
         pos2.push({
             x:0,
-            y:-105
+            y:-55
         });
         pos2.push({
-            x:0,
-            y:245
+            x:-170,
+            y:175
         });
         pos2.push({
-            x:-168,
-            y:245
+            x:150,
+            y:175
         });
         pos2.push({
-            x:168,
-            y:245
+            x:-125,
+            y:225
+        });
+         pos2.push({
+            x:-125,
+            y:-25
+        });
+         pos2.push({
+            x:125,
+            y:-25
+        });
+        pos2.push({
+            x:105,
+            y:225
         });
         var pos = [];
         var thing = [];
@@ -87,7 +110,7 @@
             scaleGridLineColor: "rgba(0,0,0,.5)",
             datasetPointStrokeColor: 'red',
             scaleGridLineWidth: 1,
-            pointDotStrokeWidth: 0,
+            pointDotStrokeWidth: .5,
             pointDot: true,
             scaleType: 'number',
             animation: false,
@@ -116,7 +139,7 @@
                 animation: false,
                 // Boolean - Whether to show a stroke for datasets
                 datasetStroke: false,
-                showTooltips: false,
+                showTooltips: true,
             });
 
         });
@@ -140,6 +163,12 @@
                 console.log("im doing something");
                 socket.emit('LDSScan', "test");
             }, 1000);
+
+        }
+
+        function cool(){
+
+            socket.emit('cool', "test");
 
         }
     </script>

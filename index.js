@@ -89,34 +89,86 @@ module.exports = {
     },
 
     getDistanceAndAngles: function(LDSScanData){
-         l = LDSScanData.length;
-        while (l--) {
-            if (LDSScanData[l].DistInMM < 800){
+        //Robot
+        var pos2 = [];
+        pos2.push({
+            x:0,
+            y:0
+        });
+        pos2.push({
+            x:0,
+            y:-55
+        });
+        pos2.push({
+            x:0,
+            y:245
+        });
+        pos2.push({
+            x:-145,
+            y:245
+        });
+        pos2.push({
+            x:145,
+            y:245
+        });
 
-                thingToSend += "<p style='color:red;'>" + LDSScanData[l].DistInMM + "mm @" + LDSScanData[l].AngleInDegrees + " Degrees</p>";
+        l = LDSScanData.length;
+        var lowestDist = 500;
+        var angle;
+
+        var tmp;
+        while (l--) {
+            tmp = LDSScanData[l].DistInMM;
+
+            if (LDSScanData[l].AngleInDegrees > 60 && LDSScanData[l].AngleInDegrees < 310){
+                tmp = LDSScanData[l].DistInMM * 2.2;
             }
-            else{
-                thingToSend += "<p>" + LDSScanData[l].DistInMM + "mm @" + LDSScanData[l].AngleInDegrees + " Degrees</p>";
+
+
+            if (tmp < lowestDist){
+                lowestDist = tmp;
+                angle = LDSScanData[l].AngleInDegrees;
+
+                if (angle > 60 && angle < 310){
+                    lowestDist = lowestDist / 2.2;
+                }
+
             }
         }
+
+        if (angle < 37.86 && angle >0){
+            //trigger front right bumper
+            thingToSend += "<p style='color:red;'>" + lowestDist + "mm @" + angle + " Degrees trigger front left bumper</p>";
+        } else if (angle < 60){
+            //trigger front left bumper
+            thingToSend += "<p style='color:green;'>" + lowestDist + "mm @" + angle + " Degrees trigger side left bumper</p>";
+        } else if (angle < 322.14 && angle >310){
+            //trigger back left bumper
+            thingToSend += "<p style='color:blue;'>" + lowestDist + "mm @" + angle + " Degrees trigger side right bumper</p>";
+        } else if (angle < 360 && angle >322.14){
+            //trigger back right bumper
+            thingToSend += "<p style='color:black;'>" + lowestDist + "mm @" + angle + " Degrees trigger front right bumper</p>";
+        } else {
+            thingToSend += "<p style='color:orange;'>" + lowestDist + "mm @" + angle + " ITS BEHIND ME</p>";
+        }
+
         persistantSocket.send(thingToSend);
         thingToSend = [];
 
     },
 
     getGraph: function(LDSScanData){
-         l = LDSScanData.length;
+        l = LDSScanData.length;
         while(l--){
 
-            if(LDSScanData[l].DistInMM < 800)
-            {
+
                 posX = LDSScanData[l].DistInMM * Math.sin(LDSScanData[l].AngleInDegrees * PI_180);
                 posY = LDSScanData[l].DistInMM * Math.cos(LDSScanData[l].AngleInDegrees * PI_180);
                 pos.push({
                     y: posY,
                     x: -posX
                 });
-            }
+
         }
         persistantSocket.emit('graph', pos);
         pos = [];
@@ -154,7 +206,7 @@ var temp = new Array();
 port.on('data', function (data) {
     counter++;
     temp = data.split(',');
-    if(temp[3] == 0 ){
+    if(temp[3] == 0 && temp[1] <= 400 ){
         LDSScanData.push({
             "AngleInDegrees" : temp[0],
             "DistInMM" : temp[1]
@@ -165,7 +217,7 @@ port.on('data', function (data) {
 
         module.exports.getDistanceAndAngles(LDSScanData);
 
-       module.exports.getGraph(LDSScanData);
+        module.exports.getGraph(LDSScanData);
 
         LDSScanData = [];
         counter = 0;
