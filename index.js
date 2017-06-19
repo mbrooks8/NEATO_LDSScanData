@@ -29,7 +29,7 @@ var PI_180 = (Math.PI/180);
 //SENDING STUFF TO WEBSITE
 var io = require('socket.io').listen(server);	//This makes sending and recieving data from the server easy
 var persistantSocket;
-app.use(express.static(__dirname + '/html'));	//Just tells the thing to use the current directory as the root page... I think
+app.use(express.static(__dirname + '/html'));	//Just tells the thing to use the current directory as the root page... I thinky
 app.get('/', function(req, res){
     res.sendfile('./index.html');			//This is how you get it to send something to the browser
 });
@@ -162,12 +162,12 @@ module.exports = {
         while(l--){
 
 
-                posX = LDSScanData[l].DistInMM * Math.sin(LDSScanData[l].AngleInDegrees * PI_180);
-                posY = LDSScanData[l].DistInMM * Math.cos(LDSScanData[l].AngleInDegrees * PI_180);
-                pos.push({
-                    y: posY,
-                    x: -posX
-                });
+            posX = LDSScanData[l].DistInMM * Math.sin(LDSScanData[l].AngleInDegrees * PI_180);
+            posY = LDSScanData[l].DistInMM * Math.cos(LDSScanData[l].AngleInDegrees * PI_180);
+            pos.push({
+                y: posY,
+                x: -posX
+            });
 
         }
         persistantSocket.emit('graph', pos);
@@ -217,7 +217,7 @@ port.on('data', function (data) {
 
         module.exports.getDistanceAndAngles(LDSScanData);
 
-        module.exports.getGraph(LDSScanData);
+         module.exports.getGraph(LDSScanData);
 
         LDSScanData = [];
         counter = 0;
@@ -255,6 +255,10 @@ io.on('connection', function(socket){
     });
 
     console.log("Website connected");
+
+    socket.on('disconnect', function() {
+        console.log('Got disconnect!');
+    });
 });
 
 //GO TO localhost:3000 to view the website
