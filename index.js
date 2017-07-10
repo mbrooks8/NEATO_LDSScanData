@@ -3,7 +3,6 @@ var http = require('http');
 var app = express();
 var server = http.createServer(app);
 var fs = require('fs');
-var Promise = require("bluebird");
 
 
 //LDS Stuff
@@ -29,7 +28,7 @@ var PI_180 = (Math.PI/180);
 //SENDING STUFF TO WEBSITE
 var io = require('socket.io').listen(server);	//This makes sending and recieving data from the server easy
 var persistantSocket;
-app.use(express.static(__dirname + '/html'));	//Just tells the thing to use the current directory as the root page... I thinky
+app.use(express.static(__dirname + '/html'));	//Just tells the thing to use the current directory as the root page... I think
 app.get('/', function(req, res){
     res.sendfile('./index.html');			//This is how you get it to send something to the browser
 });
@@ -41,6 +40,14 @@ var port = new SerialPort("COM6", {
     /*parser: SerialPort.parsers.raw*/
     parser: SerialPort.parsers.readline("\n")
 });
+
+//dontchange this used to reset value of angle and lowest dist between runs
+var lowestDist2 = 497;
+var angle2      = 360;
+
+//Initial value of lowest dist and angle
+var lowestDist  = 497;
+var angle       = 361;
 
 module.exports = {
 
@@ -64,149 +71,137 @@ module.exports = {
         if (toggled == 0){
             //write to the robot and turn on LDSrotation
             port.write('setldsrotation on', function(err) {
-                if (err) {
-                    return console.log('Error on write: ', err.message);
-                }
+                if (err) {return console.log('Error on write: ', err.message);}
             });
             toggled++;
         } else {
             //write to the robot and turn on LDSrotation
             port.write('setldsrotation off', function(err) {
-                if (err) {
-                    return console.log('Error on write: ', err.message);
-                }
+                if (err) {return console.log('Error on write: ', err.message);}
             });
             toggled--;
         }
 
         //send enter key
         port.write('\r', function(err) {
-            if (err) {
-                return console.log('Error on write: ', err.message);
-            }
+            if (err) {return console.log('Error on write: ', err.message);}
         });
-
     },
 
-    getDistanceAndAngles: function(LDSScanData){
-        //Robot
-        var pos2 = [];
-        pos2.push({
-            x:0,
-            y:0
-        });
-        pos2.push({
-            x:0,
-            y:-55
-        });
-        pos2.push({
-            x:0,
-            y:245
-        });
-        pos2.push({
-            x:-145,
-            y:245
-        });
-        pos2.push({
-            x:145,
-            y:245
-        });
-
-        l = LDSScanData.length;
-        var lowestDist = 500;
-        var angle;
+    getDistanceAndAngles: function(LDSScanData,lowestDist,angle,l){
 
         var tmp;
         while (l--) {
             tmp = LDSScanData[l].DistInMM;
+            angle = LDSScanData[l].AngleInDegrees;
 
-            if (LDSScanData[l].AngleInDegrees > 60 && LDSScanData[l].AngleInDegrees < 310){
-                tmp = LDSScanData[l].DistInMM * 2.2;
+            /*everything else*/
+            if (angle > 38 && angle < 322){
+                tmp = tmp * 4.796;
+            }
+
+            /*Left front bumper*/
+            if (angle > 0 && angle < 34){
+                tmp = tmp - 335
+            }
+
+            /*left side bumper*/
+            if (angle > 34 && angle < 38){
+                tmp = tmp / 1.1639;
+            }
+
+            /*right front bumper*/
+            if (angle > 326 && angle < 360){
+                tmp = tmp - 335
+            }
+
+            /*right side bumper*/
+            if (angle > 322 && angle < 326){
+                tmp = tmp / 1.1639;
             }
 
 
             if (tmp < lowestDist){
                 lowestDist = tmp;
-                angle = LDSScanData[l].AngleInDegrees;
 
-                if (angle > 60 && angle < 310){
-                    lowestDist = lowestDist / 2.2;
+                /*reset back to normal value*/
+                if (angle > 38 && angle < 322){
+                    lowestDist = lowestDist / 4.796;
+                }
+
+                /*Left front bumper*/
+                if (angle > 0 && angle < 34){
+                    lowestDist = lowestDist + 335;
+                }
+
+                /*left side bumper*/
+                if (angle > 34 && angle < 38){
+                    lowestDist = lowestDist * 1.1639;
+                }
+
+                /*right front bumper*/
+                if (angle > 326 && angle < 360){
+                    lowestDist = lowestDist + 335;
+                }
+
+                /*right side bumper*/
+                if (angle > 322 && angle < 326){
+                    lowestDist = lowestDist * 1.1639;
                 }
 
             }
         }
 
-        if (angle < 37.86 && angle >0){
+        if (angle < 34 && angle >0){
             //trigger front right bumper
-            thingToSend += "<p style='color:red;'>" + lowestDist + "mm @" + angle + " Degrees trigger front left bumper</p>";
-        } else if (angle < 60){
+            thingToSend += "<p style='color:orange;'>" + lowestDist + "mm @" + angle + " Degrees trigger front left bumper</p>";
+        } else if (angle <= 38){
             //trigger front left bumper
             thingToSend += "<p style='color:green;'>" + lowestDist + "mm @" + angle + " Degrees trigger side left bumper</p>";
-        } else if (angle < 322.14 && angle >310){
+        } else if (angle < 326 && angle >322){
             //trigger back left bumper
             thingToSend += "<p style='color:blue;'>" + lowestDist + "mm @" + angle + " Degrees trigger side right bumper</p>";
-        } else if (angle < 360 && angle >322.14){
+        } else if (angle < 360 && angle >326){
             //trigger back right bumper
             thingToSend += "<p style='color:black;'>" + lowestDist + "mm @" + angle + " Degrees trigger front right bumper</p>";
         } else {
-            thingToSend += "<p style='color:orange;'>" + lowestDist + "mm @" + angle + " ITS BEHIND ME</p>";
+            thingToSend += "<p style='color:red;'>" + lowestDist + "mm @" + angle + " ITS NOT TRIGGERING A BUMPER RIGHT NOW</p>";
         }
 
         persistantSocket.send(thingToSend);
         thingToSend = [];
-
     },
 
-    getGraph: function(LDSScanData){
-        l = LDSScanData.length;
+    getGraph: function(LDSScanData,l){
         while(l--){
-
-
             posX = LDSScanData[l].DistInMM * Math.sin(LDSScanData[l].AngleInDegrees * PI_180);
             posY = LDSScanData[l].DistInMM * Math.cos(LDSScanData[l].AngleInDegrees * PI_180);
             pos.push({
                 y: posY,
                 x: -posX
             });
-
         }
         persistantSocket.emit('graph', pos);
         pos = [];
     },
 
     freshRobot: function(){
-
         port.write('testmode on', function(err) {
-            if (err) {
-                return console.log('Error on write: ', err.message);
-            }
-        });
+            if (err) {return console.log('Error on write: ', err.message);}});
         port.write('\r', function(err) {
-            if (err) {
-                return console.log('Error on write: ', err.message);
-            }
-        });
+            if (err) {return console.log('Error on write: ', err.message);}});
         port.write('setldsrotation off', function(err) {
-            if (err) {
-                return console.log('Error on write: ', err.message);
-            }
-        });
+            if (err) {return console.log('Error on write: ', err.message);}});
         port.write('\r', function(err) {
-            if (err) {
-                return console.log('Error on write: ', err.message);
-            }
-        });
-
+            if (err) {return console.log('Error on write: ', err.message);}});
     },
 }
-
-
 
 var temp = new Array();
 port.on('data', function (data) {
     counter++;
     temp = data.split(',');
-    if(temp[3] == 0 && temp[1] <= 400 ){
+    if(temp[3] == 0 && temp[1] <= lowestDist ){
         LDSScanData.push({
             "AngleInDegrees" : temp[0],
             "DistInMM" : temp[1]
@@ -214,14 +209,15 @@ port.on('data', function (data) {
     }
 
     if(counter == 363){
+        l = LDSScanData.length;
+        module.exports.getDistanceAndAngles(LDSScanData,lowestDist,angle,l);
 
-        module.exports.getDistanceAndAngles(LDSScanData);
-
-         module.exports.getGraph(LDSScanData);
+        module.exports.getGraph(LDSScanData,l);
 
         LDSScanData = [];
         counter = 0;
-
+        angle = angle2;
+        lowestDist = lowestDist2;
     }
 });
 
