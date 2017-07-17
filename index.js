@@ -36,7 +36,7 @@ app.get('/', function(req, res){
 //read LDSStream from Robot
 var SerialPort = require("serialport");
 /*serial port information*/
-var port = new SerialPort("COM6", {
+var port = new SerialPort("COM4", {
     baudRate: 115200,
     /*parser: SerialPort.parsers.raw*/
     parser: SerialPort.parsers.readline("\n")
@@ -104,7 +104,7 @@ module.exports = {
             if (angle > 0 && angle <= 38){
                 fl++;
                 if(fl != 0){
-                    thingToSend += "<h1>Front Left</h1>"
+                    /* thingToSend += "<h1>Front Left</h1>"*/
                 }
             }
 
@@ -112,7 +112,7 @@ module.exports = {
             if (angle > 38 && angle <= 50){
                 sl++;
                 if(sl != 0){
-                    thingToSend += "<h1>Side Left</h1>"
+                    /*thingToSend += "<h1>Side Left</h1>"*/
                 }
             }
 
@@ -120,7 +120,7 @@ module.exports = {
             if (angle >= 330 && angle < 360){
                 fr++;
                 if(fr != 0){
-                    thingToSend += "<h1>Front Right</h1>"
+                    /*thingToSend += "<h1>Front Right</h1>"*/
                 }
             }
 
@@ -128,7 +128,7 @@ module.exports = {
             if (angle >= 314 && angle < 330){
                 sr++;
                 if(sr != 0){
-                    thingToSend += "<h1>Side Right</h1>"
+                    /* thingToSend += "<h1>Side Right</h1>"*/
                 }
             }
         }
@@ -189,7 +189,7 @@ port.on('data', function (data) {
         l = LDSScanData.length;
         module.exports.getDistanceAndAngles(LDSScanData,maxDist,angle,l,lowestDist);
         //graphs the points. For some reason no matter what robot i use, the data on the right side is off by a bit.
-        /*module.exports.getGraph(LDSScanData,l);*/
+        /* module.exports.getGraph(LDSScanData,l);*/
 
         /*reset everything back to the base values for next run*/
         LDSScanData = [];
@@ -201,9 +201,14 @@ port.on('data', function (data) {
 
 //when you first open the connection to the port
 port.on('open', function() {
+    console.log("Robot Online");
     //turn off lds if it was on and set it to test mode
     module.exports.freshRobot();
 
+});
+
+port.on('close', function() {
+    console.log("Robot Offline");
 });
 
 // open errors will be emitted as an error event
@@ -231,12 +236,12 @@ io.on('connection', function(socket){
     console.log("Website connected");
 
     socket.on('disconnect', function() {
-        console.log('Got disconnect!');
-        port.write('testmode off', function(err) {
+        console.log('Website disconnect!');
+        port.write('setldsrotation off', function(err) {
             if (err) {return console.log('Error on write: ', err.message);}});
         port.write('\r', function(err) {
             if (err) {return console.log('Error on write: ', err.message);}});
-        port.write('setldsrotation off', function(err) {
+        port.write('testmode off', function(err) {
             if (err) {return console.log('Error on write: ', err.message);}});
         port.write('\r', function(err) {
             if (err) {return console.log('Error on write: ', err.message);}});
