@@ -1,88 +1,15 @@
+/*THIS STUFF IS FOR MY FUNCTIONS TO RUN ON THE INDEX.PHP PAGE*/
+/*THIS IS LITERALLY ONLY FOR THE WEBSITE NOT FOR THE LOCAL COMPUTER*/
 var socket = io.connect("localhost:3000");
-socket.on('message', function(data){
+socket.on('bumper', function(data){
     document.getElementById("response").innerHTML = data + "<br>";
 });
-var pos2 = [];
-pos2.push({
-    x:0,
-    y:0
-});
-pos2.push({
-    x:0,
-    y:-55
-});
-pos2.push({
-    x:-170,
-    y:175
-});
-pos2.push({
-    x:150,
-    y:175
-});
-pos2.push({
-    x:-125,
-    y:225
-});
-pos2.push({
-    x:-125,
-    y:-25
-});
-pos2.push({
-    x:125,
-    y:-25
-});
-pos2.push({
-    x:105,
-    y:225
-});
-var pos = [];
-var thing = [];
-var ctx = document.getElementById("header-canvas").getContext("2d");
-var myChart = new Chart(ctx).Scatter([
-    { label: "Stuff", data: pos },
-    { label: "Robit", data: pos2 } ], {
-    showScale: true,
-    scaleShowLabels: true,
-    scaleShowHorizontalLines: true,
-    scaleShowVerticalLines: true,
-    scaleLineWidth: 1,
-    scaleLineColor: "red",
-    scaleGridLineColor: "rgba(0,0,0,.5)",
-    datasetPointStrokeColor: 'red',
-    scaleGridLineWidth: 1,
-    pointDotStrokeWidth: .3,
-    pointDot: true,
-    scaleType: 'number',
-    animation: false,
-    // Boolean - Whether to show a stroke for datasets
-    datasetStroke: false,
-    showTooltips: false,
+
+socket.on('bumperData', function(data){
+ console.log(data);
 });
 
-socket.on('graph', async function(pos){
-    var ctx = document.getElementById("header-canvas").getContext("2d");
-    var myChart = new Chart(ctx).Scatter([
-        { label: "Stuff", data: pos },
-        { label: "Robit", data: pos2 } ], {
-        showScale: true,
-        scaleShowLabels: true,
-        scaleShowHorizontalLines: true,
-        scaleShowVerticalLines: true,
-        scaleLineWidth: 1,
-        scaleLineColor: "red",
-        scaleGridLineColor: "rgba(0,0,0,.5)",
-        datasetPointStrokeColor: 'red',
-        scaleGridLineWidth: 1,
-        pointDotStrokeWidth: 0,
-        pointDot: true,
-        scaleType: 'number',
-        animation: false,
-        // Boolean - Whether to show a stroke for datasets
-        datasetStroke: false,
-        showTooltips: true,
-    });
 
-});
 //calculate things that are too close
 function sendMessage(){
     socket.emit('runMyFunction', "test");
@@ -105,4 +32,18 @@ function spam(){
         socket.emit('LDSScan', "test");
     }, 1000);
 
+}
+
+function changeValue() {
+    document.getElementById("timer").innerHTML = ++value;
+}
+
+var timerInterval = null;
+function start () {
+    stop();
+    value = 0;
+    timerInterval = setInterval(changeValue, 1000);
+}
+var stop = function() {
+    clearInterval(timerInterval );
 }

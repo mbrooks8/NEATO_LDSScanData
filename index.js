@@ -50,6 +50,12 @@ var angle       = 360;
 var maxDist  = lowestDist;
 var maxAngle = angle;
 
+//bumper data timing stuff
+var slTime = 0;
+var flTime = 0;
+var srTime = 0;
+var frTime = 0;
+
 module.exports = {
 
     getLDSScan: function(){
@@ -103,33 +109,15 @@ module.exports = {
             /*Left front bumper*/
             if (angle > 0 && angle <= 38){
                 fl++;
-                if(fl != 0){
-                    /* thingToSend += "<h1>Front Left</h1>"*/
-                }
-            }
-
-            /*left side bumper normal angle is like 38*/
-            if (angle > 38 && angle <= 50){
+            } else if( angle > 38 && angle <= 50 ){
+                /*Side left bumper*/
                 sl++;
-                if(sl != 0){
-                    /*thingToSend += "<h1>Side Left</h1>"*/
-                }
-            }
-
-            /*right front bumper*/
-            if (angle >= 330 && angle < 360){
+            } else if(angle >= 330 && angle < 360){
+                /*right front bumper*/
                 fr++;
-                if(fr != 0){
-                    /*thingToSend += "<h1>Front Right</h1>"*/
-                }
-            }
-
-            /*right side bumper*/
-            if (angle >= 314 && angle < 330){
+            } else if(angle >= 314 && angle < 330){
+                /*right side bumper*/
                 sr++;
-                if(sr != 0){
-                    /* thingToSend += "<h1>Side Right</h1>"*/
-                }
             }
         }
 
@@ -139,10 +127,47 @@ module.exports = {
         } else{
             thingToSend += "<h1>Nothing</h1>";
         }
+
+
+        /*if fl != 0 then it is being triggered*/
+        if(fl != 0 && flTime == 0){
+            persistantSocket.emit('bumperData',flTime);
+            module.exports.flStart();
+        } else if(fl == 0 && flTime != 0){
+            clearInterval(timerInterval);
+            flTime=0;
+            persistantSocket.emit('bumperData',flTime);
+            console.log(flTime);
+        }
+        if(sl != 0){
+            /*thingToSend += "<h1>Side Left</h1>"*/
+        }
+        if(fr != 0){
+            /*thingToSend += "<h1>Front Right</h1>"*/
+        }
+        if(sr != 0){
+            /* thingToSend += "<h1>Side Right</h1>"*/
+        }
+        /*how long things are being triggered*/
+        /*        bumperData += "Front Left: " + flTime + "<br>Side Left: " + slTime + "<br>Front Right: " + frTime + "<br>Side Right:" + srTime;*/
+
+        /*Number of things triggering*/
         thingToSend += "Front Left: " + fl + "<br>Side Left: " + sl + "<br>Front Right: " + fr + "<br>Side Right:" + sr;
-        persistantSocket.send(thingToSend);
+
+        /*send Stuff*/
+        persistantSocket.emit('bumper',thingToSend);
+
+        /*Reset values*/
         thingToSend = [];
     },
+    /*Front Left Start*/
+    flStart: function(){
+        timerInterval = setInterval(function(){
+            ++flTime
+            console.log(flTime);
+        }, 1000);
+    },
+
     /*sends graph to website*/
     getGraph: function(LDSScanData,l){
         while(l--){
