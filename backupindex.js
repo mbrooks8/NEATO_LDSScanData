@@ -92,54 +92,66 @@ module.exports = {
     getDistanceAndAngles: function(LDSScanData,maxDist,angle,l,lowestDist){
 
         var tmp;
-        var fl = 0;
-        var sl = 0;
-        var sr = 0;
-        var fr = 0;
         while (l--) {
             tmp = LDSScanData[l].DistInMM;
             angle = LDSScanData[l].AngleInDegrees;
 
             /*Left front bumper*/
-            if (angle > 0 && angle <= 38){
-                fl++;
-                if(fl != 0){
-                    thingToSend += "<h1>Front Left</h1>"
-                }
+            if (angle > 0 && angle < 34){
+                /*offset to make the displayed distance relative to the edge of the robot
+                --> Not the greatest measurement*/
+                tmp = tmp - 237;
             }
 
             /*left side bumper normal angle is like 38*/
-            if (angle > 38 && angle <= 50){
-                sl++;
-                if(sl != 0){
-                    thingToSend += "<h1>Side Left</h1>"
-                }
+            if (angle > 34 && angle <= 50){
+                /*offset to make the displayed distance relative to the edge of the robot
+                --> Not the greatest measurement*/
+                tmp = tmp - 230;
             }
 
             /*right front bumper*/
-            if (angle >= 330 && angle < 360){
-                fr++;
-                if(fr != 0){
-                    thingToSend += "<h1>Front Right</h1>"
-                }
+            if (angle > 326 && angle < 360){
+                /*offset to make the displayed distance relative to the edge of the robot
+                --> Not the greatest measurement*/
+                tmp = tmp - 237;
             }
 
             /*right side bumper*/
-            if (angle >= 314 && angle < 330){
-                sr++;
-                if(sr != 0){
-                    thingToSend += "<h1>Side Right</h1>"
-                }
+            if (angle >= 314 && angle < 326){
+                /*offset to make the displayed distance relative to the edge of the robot
+                --> Not the greatest measurement*/
+                tmp = tmp - 210;
+            }
+
+            /*save the values of the lowest angles and distance*/
+            if (tmp < lowestDist){
+                lowestDist = tmp;
+                lowestAngle = angle;
             }
         }
 
-        /*Some message to say if something is there*/
-        if (fl != 0 || sl != 0 || sr !=0 || fr !=0){
-            thingToSend += "<h1>Something's out there</h1>";
-        } else{
-            thingToSend += "<h1>Nothing</h1>";
+        if (lowestAngle <= 34 && lowestAngle >=0){
+            //trigger front left bumper
+            //replace this with some function w/e triggers the bumper
+            thingToSend += "<p style='color:orange;'>" + lowestDist + "mm @" + lowestAngle + " Degrees --> front left</p>";
+        } else if (lowestAngle <= 50){
+            //trigger side left bumper
+            //replace this with some function w/e triggers the bumper
+            thingToSend += "<p style='color:green;'>" + lowestDist + "mm @" + lowestAngle + " Degrees --> side left</p>";
+        } else if (lowestAngle < 326 && lowestAngle >=314){
+            //trigger side right bumper
+            //replace this with some function w/e triggers the bumper
+            thingToSend += "<p style='color:blue;'>" + lowestDist + "mm @" + lowestAngle + " Degrees --> side right</p>";
+        } else if (lowestAngle < 360 && lowestAngle >326){
+            //trigger front right bumper
+            //replace this with some function w/e triggers the bumper
+            thingToSend += "<p style='color:black;'>" + lowestDist + "mm @" + lowestAngle + " Degrees --> front right</p>";
+        } else {
+            //do nothing
+            thingToSend += "<p style='color:red;'>" + lowestDist + "mm @" + lowestAngle + " ITS NOT TRIGGERING A BUMPER RIGHT NOW</p>";
         }
-        thingToSend += "Front Left: " + fl + "<br>Side Left: " + sl + "<br>Front Right: " + fr + "<br>Side Right:" + sr;
+
         persistantSocket.send(thingToSend);
         thingToSend = [];
     },

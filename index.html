@@ -33,13 +33,13 @@
 
             <h3>Server Messages</h3>
             <div class="row">
-                <div class="col-sm-8">
+                <div class="col-sm-2">
 
-                    <canvas id="header-canvas" width="600" height="480"></canvas>
+                   <!-- <canvas id="header-canvas" width="600" height="480"></canvas>-->
 
                     <div id="LDSScanDataa"></div>
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-10">
                     <div id="response"></div>
                 </div>
 
@@ -110,7 +110,7 @@
             scaleGridLineColor: "rgba(0,0,0,.5)",
             datasetPointStrokeColor: 'red',
             scaleGridLineWidth: 1,
-            pointDotStrokeWidth: .5,
+            pointDotStrokeWidth: .3,
             pointDot: true,
             scaleType: 'number',
             animation: false,
@@ -161,7 +161,7 @@
 
             setInterval(function() {
                 socket.emit('LDSScan', "test");
-            }, 1000);
+            }, 500);
 
         }
 
