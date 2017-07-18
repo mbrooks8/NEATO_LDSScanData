@@ -3,6 +3,44 @@ var http = require('http');
 var app = express();
 var server = http.createServer(app);
 var fs = require('fs');
+/*Facny collors*/
+var colors = require('colors');
+var five = require("johnny-five"),
+    board = new five.Board({
+        port: "COM5",
+        repl: false,
+        debug: false,
+    });
+
+/*arduino board*/
+
+// Create an Led
+var ledSL;
+var ledFL;
+var ledFR;
+var ledSR;
+
+//code before the pause
+setTimeout(function(){
+    console.log("gimme a sec");
+}, 2000);
+board.on("ready", function() {
+    console.log('lights ago!!!'.rainbow)
+    // Side left pin on pin 8
+    ledSL = new five.Led(8);
+    // front left pin on pin 9
+    ledFL = new five.Led(9);
+    // Side right pin on pin 10
+    ledFR = new five.Led(10);
+    // front right pin on pin 11
+    ledSR = new five.Led(11);
+    //IDk why this needs to be here
+    ledSL.off();
+    ledFL.off();
+    ledFR.off();
+    ledSR.off();
+});
+/*End arduino board*/
 
 
 //LDS Stuff
@@ -36,7 +74,7 @@ app.get('/', function(req, res){
 //read LDSStream from Robot
 var SerialPort = require("serialport");
 /*serial port information*/
-var port = new SerialPort("COM4", {
+var port = new SerialPort("COM3", {
     baudRate: 115200,
     /*parser: SerialPort.parsers.raw*/
     parser: SerialPort.parsers.readline("\n")
@@ -129,24 +167,26 @@ module.exports = {
         }
 
 
-        /*if fl != 0 then it is being triggered*/
-        if(fl != 0 && flTime == 0){
-            persistantSocket.emit('bumperData',flTime);
-            module.exports.flStart();
-        } else if(fl == 0 && flTime != 0){
-            clearInterval(timerInterval);
-            flTime=0;
-            persistantSocket.emit('bumperData',flTime);
-            console.log(flTime);
-        }
         if(sl != 0){
-            /*thingToSend += "<h1>Side Left</h1>"*/
+            ledSL.on();
+        } else if(sl == 0){
+            module.exports.ledSLOff();
+        }
+        /*if fl != 0 then it is being triggered*/
+        if(fl != 0){
+            ledFL.on();
+        } else if(fl == 0){
+            module.exports.ledFLOff();
         }
         if(fr != 0){
-            /*thingToSend += "<h1>Front Right</h1>"*/
+            ledFR.on();
+        } else if(fr == 0){
+            module.exports.ledFROff();
         }
         if(sr != 0){
-            /* thingToSend += "<h1>Side Right</h1>"*/
+            ledSR.on();
+        } else if(sr == 0){
+            module.exports.ledSROff();
         }
         /*how long things are being triggered*/
         /*        bumperData += "Front Left: " + flTime + "<br>Side Left: " + slTime + "<br>Front Right: " + frTime + "<br>Side Right:" + srTime;*/
@@ -166,6 +206,23 @@ module.exports = {
             ++flTime
             console.log(flTime);
         }, 1000);
+    },
+
+    /*Fuck this LED*/
+    ledSLOff: function(){
+        ledSL.off();
+    },
+    /*Fuck this LED*/
+    ledFLOff: function(){
+        ledFL.off();
+    },
+    /*Fuck this LED*/
+    ledFROff: function(){
+        ledFR.off();
+    },
+    /*Fuck this LED*/
+    ledSROff: function(){
+        ledSR.off();
     },
 
     /*sends graph to website*/
@@ -258,10 +315,10 @@ io.on('connection', function(socket){
 
     });
 
-    console.log("Website connected");
+    console.log("Website connected".green);
 
     socket.on('disconnect', function() {
-        console.log('Website disconnect!');
+        console.log('Website disconnect!'.red);
         port.write('setldsrotation off', function(err) {
             if (err) {return console.log('Error on write: ', err.message);}});
         port.write('\r', function(err) {

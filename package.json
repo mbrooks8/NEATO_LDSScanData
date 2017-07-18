@@ -6,8 +6,10 @@
     "dependencies": {
         "babyparse": "^0.4.6",
         "chai": "^4.0.2",
+        "colors": "^1.1.2",
         "express": "^4.15.3",
         "http": "^0.0.0",
+        "johnny-five": "^0.11.3",
         "papaparse": "^4.3.2",
         "request": "^2.81.0",
         "serialport": "^4.0.7",
