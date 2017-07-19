@@ -5,7 +5,6 @@ var server = http.createServer(app);
 var fs = require('fs');
 /*Facny collors*/
 var colors = require('colors');
-var arduinoPort = "COM5";
 var five = require("johnny-five"),
     board = new five.Board({
         port: "COM5",
@@ -42,7 +41,7 @@ app.get('/', function(req, res){
 });
 
 //Initial value of lowest dist and angle
-var lowestDist  = 113 + 237;
+var lowestDist  = 123 + 237;
 var lowestAngle = 360;
 var angle       = 360;
 //Used to reset values of lowest dist and angle

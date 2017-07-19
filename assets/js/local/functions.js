@@ -36,7 +36,7 @@ module.exports = {
             if (err) {return console.log('Error on write: ', err.message);}
         });
     },
-
+    /*Gets distance and angles from LDS data to trigger bumpers*/
     getDistanceAndAngles: function(LDSScanData,maxDist,angle,l,lowestDist){
 
         var tmp;
@@ -71,32 +71,13 @@ module.exports = {
             thingToSend += "<h1>Nothing</h1>";
         }
 
+        /*turns on leds if any of the vlues of fl sl sr or fr are larger than 0 --> larger than 0 is triggering the bumper*/
+        module.exports.bumperLight();
 
-        if(sl != 0){
-            ledSL.on();
-        } else if(sl == 0){
-            module.exports.ledSLOff();
-        }
-        /*if fl != 0 then it is being triggered*/
-        if(fl != 0){
-            ledFL.on();
-        } else if(fl == 0){
-            module.exports.ledFLOff();
-        }
-        if(fr != 0){
-            ledFR.on();
-        } else if(fr == 0){
-            module.exports.ledFROff();
-        }
-        if(sr != 0){
-            ledSR.on();
-        } else if(sr == 0){
-            module.exports.ledSROff();
-        }
         /*how long things are being triggered*/
         /*        bumperData += "Front Left: " + flTime + "<br>Side Left: " + slTime + "<br>Front Right: " + frTime + "<br>Side Right:" + srTime;*/
 
-        /*Number of things triggering*/
+        /*Number of things being triggered*/
         thingToSend += "Front Left: " + fl + "<br>Side Left: " + sl + "<br>Front Right: " + fr + "<br>Side Right:" + sr;
 
         /*send Stuff*/
@@ -105,7 +86,37 @@ module.exports = {
         /*Reset values*/
         thingToSend = [];
     },
-    /*Front Left Start*/
+
+    /*Bumper light trigger*/
+    bumperLight: function(){
+
+        if(sl != 0){
+            ledSL.on();
+        } else if(sl == 0){
+            module.exports.ledSLOff();
+        }
+
+        /*if fl != 0 then it is being triggered*/
+        if(fl != 0){
+            ledFL.on();
+        } else if(fl == 0){
+            module.exports.ledFLOff();
+        }
+
+        if(fr != 0){
+            ledFR.on();
+        } else if(fr == 0){
+            module.exports.ledFROff();
+        }
+
+        if(sr != 0){
+            ledSR.on();
+        } else if(sr == 0){
+            module.exports.ledSROff();
+        }
+    },
+
+    /*Front Left timer Start*/
     flStart: function(){
         timerInterval = setInterval(function(){
             ++flTime
