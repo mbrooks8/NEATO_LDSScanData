@@ -12,37 +12,6 @@ var five = require("johnny-five"),
         debug: false,
     });
 
-/*arduino board*/
-
-// Create an Led
-var ledSL;
-var ledFL;
-var ledFR;
-var ledSR;
-
-//code before the pause
-setTimeout(function(){
-    console.log("gimme a sec");
-}, 2000);
-board.on("ready", function() {
-    console.log('lights ago!!!'.rainbow)
-    // Side left pin on pin 8
-    ledSL = new five.Led(8);
-    // front left pin on pin 9
-    ledFL = new five.Led(9);
-    // Side right pin on pin 10
-    ledFR = new five.Led(10);
-    // front right pin on pin 11
-    ledSR = new five.Led(11);
-    //IDk why this needs to be here
-    ledSL.off();
-    ledFL.off();
-    ledFR.off();
-    ledSR.off();
-});
-/*End arduino board*/
-
-
 //LDS Stuff
 var counter = 0;
 var LDSScanData = [];
@@ -71,15 +40,6 @@ app.get('/', function(req, res){
     res.sendfile('./index.html');			//This is how you get it to send something to the browser
 });
 
-//read LDSStream from Robot
-var SerialPort = require("serialport");
-/*serial port information*/
-var port = new SerialPort("COM3", {
-    baudRate: 115200,
-    /*parser: SerialPort.parsers.raw*/
-    parser: SerialPort.parsers.readline("\n")
-});
-
 //Initial value of lowest dist and angle
 var lowestDist  = 113 + 237;
 var lowestAngle = 360;
@@ -93,6 +53,46 @@ var slTime = 0;
 var flTime = 0;
 var srTime = 0;
 var frTime = 0;
+
+/*arduino board*/
+
+// Create an Led
+var ledSL;
+var ledFL;
+var ledFR;
+var ledSR;
+
+//code before the pause
+setTimeout(function(){
+    console.log("gimme a sec");
+}, 2000);
+
+board.on("ready", function() {
+    console.log('lights ago!!!'.rainbow)
+    // Side left pin on pin 8
+    ledSL = new five.Led(8);
+    // front left pin on pin 9
+    ledFL = new five.Led(9);
+    // Side right pin on pin 10
+    ledFR = new five.Led(10);
+    // front right pin on pin 11
+    ledSR = new five.Led(11);
+    //IDk why this needs to be here
+    ledSL.off();
+    ledFL.off();
+    ledFR.off();
+    ledSR.off();
+});
+/*End arduino board*/
+
+//read LDSStream from Robot
+var SerialPort = require("serialport");
+/*serial port information*/
+var port = new SerialPort("COM3", {
+    baudRate: 115200,
+    /*parser: SerialPort.parsers.raw*/
+    parser: SerialPort.parsers.readline("\n")
+});
 
 module.exports = {
 
@@ -140,6 +140,7 @@ module.exports = {
         var sl = 0;
         var sr = 0;
         var fr = 0;
+        /*theres like 360 things inside of LDSScanData*/
         while (l--) {
             tmp = LDSScanData[l].DistInMM;
             angle = LDSScanData[l].AngleInDegrees;

@@ -30,7 +30,7 @@ function spam(){
 
     setInterval(function() {
         socket.emit('LDSScan', "test");
-    }, 1000);
+    },750);
 
 }
 

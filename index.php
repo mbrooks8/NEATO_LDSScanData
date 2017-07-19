@@ -1,5 +1,5 @@
 <?php
-require('topNav.php');
+require('./assets/template/topNav.php');
 ?>
 
 <div class="container">
@@ -27,5 +27,5 @@ require('topNav.php');
 </div>
 
 <?php
-require('botNav.php');
+require('./assets/template/botNav.php');
 ?>
