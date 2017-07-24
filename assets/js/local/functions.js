@@ -40,10 +40,7 @@ module.exports = {
     getDistanceAndAngles: function(LDSScanData,maxDist,angle,l,lowestDist){
 
         var tmp;
-        var fl = 0;
-        var sl = 0;
-        var sr = 0;
-        var fr = 0;
+
         /*theres like 360 things inside of LDSScanData*/
         while (l--) {
             tmp = LDSScanData[l].DistInMM;
@@ -85,6 +82,10 @@ module.exports = {
 
         /*Reset values*/
         thingToSend = [];
+        sl=0;
+        fl=0;
+        fr=0;
+        sr=0;
     },
 
     /*Bumper light trigger*/

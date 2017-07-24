@@ -5,14 +5,8 @@ var server = http.createServer(app);
 var fs = require('fs');
 /*Facny collors*/
 var colors = require('colors');
-var five = require("johnny-five"),
-    board = new five.Board({
-        port: "COM5",
-        repl: false,
-        debug: false,
-    });
-var pixel = require("node-pixel");
-var strip = null;
+
+
 //LDS Stuff
 var counter = 0;
 var LDSScanData = [];
@@ -54,6 +48,10 @@ var slTime = 0;
 var flTime = 0;
 var srTime = 0;
 var frTime = 0;
+var fl = 0;
+var sl = 0;
+var sr = 0;
+var fr = 0;
 
 //read LDSStream from Robot
 var SerialPort = require("serialport");

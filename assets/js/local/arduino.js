@@ -1,5 +1,17 @@
 /*arduino board*/
 
+//ardino board stuff
+var five = require("johnny-five"),
+    board = new five.Board({
+        port: "COM5",
+        repl: false,
+        debug: false,
+    });
+
+//LED STrip
+pixel = require("node-pixel");
+var strip = null;
+
 // Create an Led
 var ledSL;
 var ledFL;
@@ -12,6 +24,7 @@ setTimeout(function(){
 }, 2000);
 
 board.on("ready", function() {
+    //Bumper LEDS
     console.log('lights ago!!!'.rainbow)
     // Side left pin on pin 8
     ledSL = new five.Led(8);
@@ -28,26 +41,33 @@ board.on("ready", function() {
     ledSR.off();
 
     // Define our hardware.
-    // It's a 12px ring connected to pin 6.
+    // It's a 40px ring connected to pin 6.
     strip = new pixel.Strip({
-        pin: 6, // this is still supported as a shorthand
-        length: 4,
-        firmata: board,
+        board: this,
         controller: "FIRMATA",
+        strips: [ {pin: 6, length: 40}, ],
+        gamma: 2.8,
     });
 
     // Just like DOM-ready for web developers.
     strip.on("ready", function() {
-        console.log('Strip!!'.white)
         // Set the entire strip to pink.
         strip.color('#903');
-        // Send instructions to NeoPixel.
-        strip.show();
-    });
 
-    // Allows for command-line experimentation!
-    this.repl.inject({
-        strip: strip
+        // Set first and seventh pixels to turquoise.
+        strip.pixel(0).color('#074');
+        strip.pixel(6).color('#074');
+
+        // Display initial state.
+        strip.show();
+
+        // Loop the following command forever
+        // at 12fps until Arduino powers down.
+        var loop = setInterval(function () {
+            // Shift all pixels clockwise
+            strip.shift(1, pixel.FORWARD, true);
+            strip.show();
+        }, 1000 / 12);
     });
 });
 /*End arduino board*/
