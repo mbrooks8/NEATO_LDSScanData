@@ -27,6 +27,7 @@ io.on('connection', function(socket){
             if (err) {return console.log('Error on write: ', err.message);}});
         port.write('\r', function(err) {
             if (err) {return console.log('Error on write: ', err.message);}});
+
     });
 });
 

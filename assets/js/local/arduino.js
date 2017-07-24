@@ -18,14 +18,9 @@ var ledFL;
 var ledFR;
 var ledSR;
 
-//code before the pause
-setTimeout(function(){
-    console.log("gimme a sec");
-}, 2000);
-
 board.on("ready", function() {
     //Bumper LEDS
-    console.log('lights ago!!!'.rainbow)
+    console.log('Board Ready!!!'.white);
     // Side left pin on pin 8
     ledSL = new five.Led(8);
     // front left pin on pin 9
@@ -40,7 +35,7 @@ board.on("ready", function() {
     ledFR.off();
     ledSR.off();
 
-    // Define our hardware.
+    // Define our led light strip
     // It's a 40px ring connected to pin 6.
     strip = new pixel.Strip({
         board: this,
@@ -51,12 +46,16 @@ board.on("ready", function() {
 
     // Just like DOM-ready for web developers.
     strip.on("ready", function() {
+
+        console.log('Strip Ready!!!'.white);
         // Set the entire strip to pink.
         strip.color('#903');
 
         // Set first and seventh pixels to turquoise.
         strip.pixel(0).color('#074');
-        strip.pixel(6).color('#074');
+        strip.pixel(10).color('#074');
+        strip.pixel(20).color('#074');
+        strip.pixel(30).color('#074');
 
         // Display initial state.
         strip.show();
