@@ -1,3 +1,36 @@
+function bumperLight(){
+
+    if(sl != 0){
+        console.log("Side Left On");
+        ledSL.on();
+    } else if(sl == 0){
+        ledSL.off();
+    }
+
+    /*if fl != 0 then it is being triggered*/
+    if(fl != 0){
+        console.log("Front Left On");
+        ledFL.on();
+    } else if(fl == 0){
+        ledFL.off();
+    }
+
+    if(fr != 0){
+        console.log("Front Right On");
+        ledFR.on();
+    } else if(fr == 0){
+        ledFR.off();
+    }
+
+    if(sr != 0){
+        console.log("Side Right On");
+        ledSR.on();
+    } else if(sr == 0){
+        ledSR.off();
+    }
+
+}
+
 module.exports = {
 
     getLDSScan: function(){
@@ -16,7 +49,7 @@ module.exports = {
     },
 
     setLDSRotation: function(){
-
+        dynamicRainbow();
         if (toggled == 0){
             //write to the robot and turn on LDSrotation
             port.write('setldsrotation on', function(err) {
@@ -24,6 +57,8 @@ module.exports = {
             });
             toggled++;
         } else {
+            strip.off();
+            strip.show();
             //write to the robot and turn off LDSrotation
             port.write('setldsrotation off', function(err) {
                 if (err) {return console.log('Error on write: ', err.message);}
@@ -38,7 +73,6 @@ module.exports = {
     },
     /*Gets distance and angles from LDS data to trigger bumpers*/
     getDistanceAndAngles: function(LDSScanData,maxDist,angle,l,lowestDist){
-
         var tmp;
 
         /*theres like 360 things inside of LDSScanData*/
@@ -69,7 +103,7 @@ module.exports = {
         }
 
         /*turns on leds if any of the vlues of fl sl sr or fr are larger than 0 --> larger than 0 is triggering the bumper*/
-        module.exports.bumperLight();
+        bumperLight();
 
         /*how long things are being triggered*/
         /*        bumperData += "Front Left: " + flTime + "<br>Side Left: " + slTime + "<br>Front Right: " + frTime + "<br>Side Right:" + srTime;*/
@@ -88,34 +122,6 @@ module.exports = {
         sr=0;
     },
 
-    /*Bumper light trigger*/
-    bumperLight: function(){
-
-        if(sl != 0){
-            ledSL.on();
-        } else if(sl == 0){
-            module.exports.ledSLOff();
-        }
-
-        /*if fl != 0 then it is being triggered*/
-        if(fl != 0){
-            ledFL.on();
-        } else if(fl == 0){
-            module.exports.ledFLOff();
-        }
-
-        if(fr != 0){
-            ledFR.on();
-        } else if(fr == 0){
-            module.exports.ledFROff();
-        }
-
-        if(sr != 0){
-            ledSR.on();
-        } else if(sr == 0){
-            module.exports.ledSROff();
-        }
-    },
 
     /*Front Left timer Start*/
     flStart: function(){
@@ -125,22 +131,6 @@ module.exports = {
         }, 1000);
     },
 
-    /*Fuck this LED*/
-    ledSLOff: function(){
-        ledSL.off();
-    },
-    /*Fuck this LED*/
-    ledFLOff: function(){
-        ledFL.off();
-    },
-    /*Fuck this LED*/
-    ledFROff: function(){
-        ledFR.off();
-    },
-    /*Fuck this LED*/
-    ledSROff: function(){
-        ledSR.off();
-    },
 
     /*sends graph to website*/
     getGraph: function(LDSScanData,l){
