@@ -26,5 +26,28 @@ board.on("ready", function() {
     ledFL.off();
     ledFR.off();
     ledSR.off();
+
+    // Define our hardware.
+    // It's a 12px ring connected to pin 6.
+    strip = new pixel.Strip({
+        pin: 6, // this is still supported as a shorthand
+        length: 4,
+        firmata: board,
+        controller: "FIRMATA",
+    });
+
+    // Just like DOM-ready for web developers.
+    strip.on("ready", function() {
+        console.log('Strip!!'.white)
+        // Set the entire strip to pink.
+        strip.color('#903');
+        // Send instructions to NeoPixel.
+        strip.show();
+    });
+
+    // Allows for command-line experimentation!
+    this.repl.inject({
+        strip: strip
+    });
 });
 /*End arduino board*/

@@ -11,7 +11,8 @@ var five = require("johnny-five"),
         repl: false,
         debug: false,
     });
-
+var pixel = require("node-pixel");
+var strip = null;
 //LDS Stuff
 var counter = 0;
 var LDSScanData = [];
