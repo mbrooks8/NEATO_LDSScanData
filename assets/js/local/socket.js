@@ -2,6 +2,13 @@ io.on('connection', function(socket){
     persistantSocket = socket;
     module.exports.freshRobot();
 
+    if (typeof strip.color != 'undefined')
+    {
+        strip.color("#00FF00"); // turns entire strip green using a hex colour
+        strip.show();
+    }
+
+
     socket.on('setldsrotation', function(data){
         //run setLDSRotation though the COM port
         module.exports.setLDSRotation();
@@ -27,8 +34,15 @@ io.on('connection', function(socket){
             if (err) {return console.log('Error on write: ', err.message);}});
         port.write('\r', function(err) {
             if (err) {return console.log('Error on write: ', err.message);}});
-        strip.off();
-        strip.show();
+
+
+        if (typeof strip.color != 'undefined')
+        {
+            strip.color("#ff0000"); // turns entire strip red using a hex colour
+            strip.show();
+        }
+
+
     });
 });
 

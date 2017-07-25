@@ -28,7 +28,7 @@ function bumperLight(){
     } else if(sr == 0){
         ledSR.off();
     }
-
+    console.log("-----------------------------------".white);
 }
 
 module.exports = {
@@ -49,7 +49,8 @@ module.exports = {
     },
 
     setLDSRotation: function(){
-        dynamicRainbow();
+        //check this fucntion
+        greenRun(fps);
         if (toggled == 0){
             //write to the robot and turn on LDSrotation
             port.write('setldsrotation on', function(err) {
@@ -57,8 +58,6 @@ module.exports = {
             });
             toggled++;
         } else {
-            strip.off();
-            strip.show();
             //write to the robot and turn off LDSrotation
             port.write('setldsrotation off', function(err) {
                 if (err) {return console.log('Error on write: ', err.message);}
@@ -121,16 +120,6 @@ module.exports = {
         fr=0;
         sr=0;
     },
-
-
-    /*Front Left timer Start*/
-    flStart: function(){
-        timerInterval = setInterval(function(){
-            ++flTime
-            console.log(flTime);
-        }, 1000);
-    },
-
 
     /*sends graph to website*/
     getGraph: function(LDSScanData,l){
