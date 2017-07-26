@@ -1,3 +1,13 @@
+// sleep time expects milliseconds
+function sleep (time) {
+  return new Promise((resolve) => setTimeout(resolve, time));
+}
+
+// Usage!
+sleep(500).then(() => {
+    console.log("slept");
+});
+
 function bumperLight(){
 
     if(sl != 0){

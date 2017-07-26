@@ -117,3 +117,6 @@ function colorWheel( WheelPos ){
     return "rgb(" + r +"," + g + "," + b + ")";
 }
 /*End arduino board*/
+setTimeout(function(){
+    console.log("gimme a sec");
+}, 3000);
