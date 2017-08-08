@@ -1,0 +1,243 @@
+#include <Adafruit_NeoPixel.h>
+#define PIN 6
+int ledNum;
+
+// Parameter 1 = number of pixels in strip
+// Parameter 2 = pin number (most are valid)
+// Parameter 3 = pixel type flags, add together as needed:
+//   NEO_KHZ800  800 KHz bitstream (most NeoPixel products w/WS2812 LEDs)
+//   NEO_KHZ400  400 KHz (classic 'v1' (not v2) FLORA pixels, WS2811 drivers)
+//   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
+//   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(39, PIN, NEO_GRB + NEO_KHZ800);
+//Set the default colors here
+uint32_t lightBlue =  strip.Color(30, 144, 255); // Light Blue
+uint32_t royalBlue =  strip.Color(65, 105, 255); // Royal Blue
+uint32_t red =  strip.Color(230, 0, 0); // RED
+uint32_t green =  strip.Color(0, 255, 0); // green
+//Dont touch this
+int modifier = 360 / strip.numPixels();
+//Change this stuff down here
+uint32_t defaultColor = royalBlue;
+uint32_t eyeColor = green;
+uint32_t errorColor = red;
+
+void setup() {
+  strip.begin();
+  strip.show(); // Initialize all pixels to 'off'
+
+  //Ring fade in
+  for (int i = 0; i < 100; i++) {
+    colorWipe(defaultColor, 0);
+    strip.setBrightness(i);
+    strip.show();
+  }
+
+  //Basic Demo 1
+  //Re:  Basic visual test (easiest, could satisfy #2)
+  //Color and size
+  //•  Eye color on the LED is light blue/green --> RGB(0, 255, 0)
+  //• Rest of LED is a royal blue --> RGB(65, 105, 255);
+  //• The “eye” part is about 3cm wide --> Currently its 3 leds wide
+  //Basic motion (to get a sense of movement, doesn’t need to be exactly this
+  //• The eye looks forward for 10 seconds --> 10 Seconds
+  //• Then, it moves slowly 30 degrees to the right --> takes a second to move 30 degrees
+  //• Pauses for 1-2 seconds --> Waits for 2 seconds
+  //• Then the eye moves 30 degrees back to the center and stands still --> moves back 30 degrees in 1 second
+  // The functions I wrote allows the eyes to move to any position using:
+  // eyeMove(degree, eyeSpeed);
+  // Degree is the degree that you want to move the eye
+  // eyeSpeed is how fast you want the eye to move to the new location
+  // Eye movements will be much smoother if there are more leds --> currently at 40 leds so each led makes up for 9 degrees.
+
+  eyeMove(0, eyeColor);
+  delay(500);
+  eyeMove(0, 1000);
+  delay(500);
+  eyeMove(90, 1000);
+  delay(500);
+  eyeMove(180, 1000);
+  delay(500);
+  eyeMove(270, 1000);
+  delay(500);
+  eyeMove(360, 1000);
+  delay(500);
+  eyeMove(270, 1000);
+  delay(500);
+  eyeMove(180, 1000);
+  delay(500);
+  eyeMove(90, 1000);
+  delay(500);
+  eyeMove(0, 1000);
+  delay(100000000000000);
+  //Demo 2
+  //Re: Testing directional intent (more effort, could satisfy #2 and #3)
+  //The following is the ideal case.  If there is a way to reduce effort by simplifying, let me know.
+  //Doug's latest video embodies this behavior fairly closely too: Link
+  //Color and size
+  //•  Eye color on the LED is light blue/green --> variable by changing the value of eyeColor
+  //• Rest of LED is a royal blue --> variable by changing the value of defaultColor
+  //• The “eye” part is about 3cm wide --> change this by editing the eye(); Function
+  //Proposed motion spec
+  //• Light points forward to start --> Done
+  //• If the robot’s next move requires less than a 15 degree turn, the eye remains straight forward --> if ritard is less than 15 do nothing
+  //• If the robot’s next move requires the robot to turn more than 15 degrees, then the eye moves in the direction of turn to the same angle of the intended direction.
+  //    i.e. if the robot plans to turn 30 degrees, then the eye should move 30 degrees. --> Get intended angle the robot wants to face and pass that value into eyeMove();
+  //• As the robot turns toward the direction for its next move, the light should remain focused on its intended direction.
+  //    i.e. the light moves in the opposite direction of the robot's turn, at the same rate as the robot turning, so by the time the turn is completed,
+  //         the light is pointed straight forward as the robot moves in that direction. --> as the robot turns, pass the angle that it is facing into eyeMove();
+  //• If the robot is going to back-up, the light points backward (is this possible?)    --> Dont know what you want to do when the robot reverses, but I made it rainbow.
+
+  backItUp(10000);
+  colorWipe(defaultColor, 0);
+  eyeMove(100, 1000);
+  delay(500);
+  eyeMove(20, 1000);
+  delay(500);
+  eyeMove(200, 1000);
+  delay(500);
+  eyeMove(100, 1000);
+
+  //Other stuff I wasted time on
+  //Error / something is wrong
+  // Its a pulsing red light
+  ringPulse(errorColor, 10000);
+  strip.setBrightness(100);
+  colorWipe(defaultColor, 0);
+
+
+
+
+
+}
+
+void loop() {
+
+}
+
+//this is supposed to pulse the light but its not working --> dont use this
+void ringPulse(uint32_t c, uint8_t wait) {
+  long starttime = millis();
+  long endtime = starttime;
+  int i = 0;
+
+  while ((endtime - starttime) <= 10000) // do this loop for up to 1000mS
+  {
+    if (i = 0) {
+      for ( i = 0; i < 80; i++) {
+        strip.setBrightness(i);
+        colorWipe(c, 0);
+        strip.show();
+        delay(2);
+        Serial.print("123 \n /n");
+      }
+    } else {
+      for ( i = 80; i >= 0; --i) {
+        strip.setBrightness(i);
+        colorWipe(c, 0);
+        strip.show();
+        delay(2);
+        Serial.print("getting darker");
+      }
+    }
+    endtime = millis();
+  }
+
+}
+
+// Fill the dots one after the other with a color
+void backItUp(uint8_t wait) {
+  eyeMove(280, 100);
+  uint16_t i, j;
+  for (j = 0; j < 256; j++) {
+    for (i = 25; i < 38; i++) {
+      strip.setPixelColor(i, Wheel((i + j) & 255));
+    }
+    strip.show();
+    delay(wait);
+  }
+}
+
+// Input a value 0 to 255 to get a color value.
+// The colours are a transition r - g - b - back to r.
+uint32_t Wheel(byte WheelPos) {
+  if (WheelPos < 85) {
+    return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
+  } else if (WheelPos < 170) {
+    WheelPos -= 85;
+    return strip.Color(255 - WheelPos * 3, 0, WheelPos * 3);
+  } else {
+    WheelPos -= 170;
+    return strip.Color(0, WheelPos * 3, 255 - WheelPos * 3);
+  }
+}
+//This thing moves the eye
+int tempDegree;
+void eyeMove(int degree, int eyeSpeed) {
+  //Serial.print("movin the eye");
+  //We have our initial leds that are lit up we set a new temp led number to move the eye to that direction
+  int oldDegree = ledNum * modifier; // get degree from the previus LED number
+  //Number of degrees i need to move to get to the new location
+  int ritard;
+  int go;
+  ritard = abs(degree - oldDegree);
+
+
+  if (ritard > 15) {
+    //we sent tempdegree because we need the value of old degree for the next time we run the function to move the eye
+    tempDegree = oldDegree;
+    
+    if (degree - oldDegree > 0 ) {
+      //forward
+      go = 0;
+    } else {
+      //backwards
+      go = 1;
+      ritard = 180 - abs(ritard);
+    }
+    
+    for (uint16_t i = 0; i < ritard; i++) {
+      //we go from tempDegree to the new inputed degree to slowly transition from the current eye to the new eye
+      //if the new degree is large than the old degree we will incriment temp degree to move the eye clockwise
+      //if the degree is negative then we need to move the eye in the other direction
+      if (go == 0) {
+        ++tempDegree;
+      } else {
+        Serial.print("Going Back");
+        --tempDegree;
+      }
+      Serial.print(tempDegree);
+      Serial.println();
+      eye(tempDegree, eyeColor);
+      //Eye speed set in the function call is the total time itll take to complete the entire function. ritard gives us the number of times we need to call eye()
+      delay(eyeSpeed / ritard);
+    }
+  }
+}
+
+// Fill Strip with 3 leds to be the eye --> More leds will be used if the strip changes to have more leds
+// degree is the degree that you want to move the eye
+// c is the color that you want the eye to be
+void eye(int degree, uint32_t c) {
+
+  //figure out which led needs to be lit for the main eye led
+  ledNum = abs((degree / modifier));
+  //these 3 pixels make up the color of the eye the first one is the main pixel
+  strip.setPixelColor(ledNum, c);
+  strip.setPixelColor((ledNum + 1) % strip.numPixels(), c);
+  strip.setPixelColor((strip.numPixels() + (ledNum - 1))  % strip.numPixels(), c);
+
+  //these two resets the colors when the eye needs to move
+  strip.setPixelColor((strip.numPixels() + (ledNum - 2))  % strip.numPixels(), defaultColor);
+  strip.setPixelColor((ledNum + 2) % strip.numPixels(), defaultColor);
+  strip.show();
+}
+
+// Fill the dots one after the other with a color
+void colorWipe(uint32_t c, uint8_t wait) {
+  for (uint16_t i = 0; i < strip.numPixels(); i++) {
+    strip.setPixelColor(i, c);
+    strip.show();
+    delay(wait);
+  }
+}
