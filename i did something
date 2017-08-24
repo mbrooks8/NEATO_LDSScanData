@@ -23,7 +23,7 @@ uint32_t eyeColor = green;
 uint32_t errorColor = red;
 
 void setup() {
-  strip.begin();
+  strip.begin(); 
   strip.show(); // Initialize all pixels to 'off'
 
   //Ring fade in
@@ -241,3 +241,117 @@ void colorWipe(uint32_t c, uint8_t wait) {
     delay(wait);
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void loop() {
+
+  getpacket();
+
+  if (index() == 0) {
+    swapbuffers();
+    //      Serial.println(bright2pwm[*(led0)]);
+  }
+  a = angle();
+
+  for (int i = 0; i < 4; ++i, ++a) {
+
+    d = dist(i);
+    //LDSScanData[l].DistInMM * Math.sin(LDSScanData[l].AngleInDegrees * PI_180);
+    x = d * sin(a * pi / 180);
+    y = d * cos(a * pi / 180);
+    pointInPolygon();
+    if (oddNodes = 1) {
+      if (d > lowestDistance && d < largestDistance) {
+       
+        if (a > 0 && a <= 38) {
+          /*Left front bumper*/
+          eyeMove(a + 100, 10);
+          digitalWrite(lf, HIGH);   // sets the bumper to be pressed
+          Serial.print("lf");
+          delay(500);
+          digitalWrite(lf, LOW);   // sets the bumper to not pressed
+
+        } else if ( a > 38 && a <= 50 ) {
+          /*Side left bumper*/
+           eyeMove(a + 100, 10);
+          digitalWrite(ls, HIGH);   // sets the bumper to be pressed
+          delay(500);
+          digitalWrite(ls, LOW);   // sets the bumper to not pressed
+
+        } else if (a >= 330 && a < 360) {
+          /*right front bumper*/
+            eyeMove(a + 100, 10);
+          digitalWrite(rf, HIGH);   // sets the bumper to be pressed
+          delay(500);
+        digitalWrite(rf, LOW);   // sets the bumper to not pressed
+
+        } else if (a >= 314 && a < 330) {
+          /*right side bumper*/
+            eyeMove(a + 100, 10);
+          digitalWrite(rs, HIGH);   // sets the bumper to be pressed
+          delay(500);
+         digitalWrite(rs, LOW);   // sets the bumper to not pressed
+
+        }
+      }
+    }
+  }
+}
+
+
